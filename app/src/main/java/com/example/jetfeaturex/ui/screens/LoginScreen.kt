@@ -1,34 +1,37 @@
 package com.yourname.jetfeaturex.ui.screens
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.navigation.NavController
+import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.Visibility
+//import androidx.compose.material.icons.filled.VisibilityOff
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
+    var scale by remember { mutableStateOf(1f) }
+    val scaleAnimation = animateFloatAsState(
+        targetValue = scale,
+        animationSpec = tween(durationMillis = 200)
+    )
+    var errorMessage by remember { mutableStateOf("") }
 
     // Animasyon: Fade-in için alpha değerini kontrol eden animasyon
     val alphaAnimation = rememberInfiniteTransition().animateFloat(
@@ -38,13 +41,6 @@ fun LoginScreen(navController: NavController) {
             animation = tween(durationMillis = 2000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         )
-    )
-
-    // Animasyon: Buton tıklama efekti
-    var scale by remember { mutableStateOf(1f) }
-    val scaleAnimation = animateFloatAsState(
-        targetValue = scale,
-        animationSpec = tween(durationMillis = 200)
     )
 
     Box(
@@ -75,6 +71,7 @@ fun LoginScreen(navController: NavController) {
                 onValueChange = { username = it },
                 label = { Text("Username") },
                 placeholder = { Text("Enter your username") },
+                isError = username.isBlank() && errorMessage.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -87,18 +84,43 @@ fun LoginScreen(navController: NavController) {
                 onValueChange = { password = it },
                 label = { Text("Password") },
                 placeholder = { Text("Enter your password") },
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+//                        Icon(
+//                            imageVector = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+//                            contentDescription = "Toggle Password Visibility"
+//                        )
+                    }
+                },
+                isError = password.isBlank() && errorMessage.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Error Message
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
 
             // Animated Login Button
             Button(
                 onClick = {
-                    scale = 0.9f // Buton tıklandığında küçülme animasyonu
-//                    navController.navigate("home")
+                    if (username.isBlank() || password.isBlank()) {
+                        errorMessage = "Please fill out all fields."
+                    } else {
+                        errorMessage = ""
+                        scale = 0.9f // Animation Effect
+                        navController.navigate("home")
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,7 +131,7 @@ fun LoginScreen(navController: NavController) {
                 Text(text = "Login", style = MaterialTheme.typography.bodyLarge)
             }
 
-            // Animasyon sona erdiğinde butonu geri döndür
+            // Reset button scale animation after click
             LaunchedEffect(scale) {
                 if (scale < 1f) {
                     scale = 1f
@@ -123,6 +145,5 @@ fun LoginScreen(navController: NavController) {
 @Preview(showBackground = true, name = "Login Screen Preview")
 @Composable
 fun LoginScreenPreview() {
-    // Preview'de navController gerekmez, yerine dummy bir içerik gösterilir
     LoginScreen(navController = NavController(LocalContext.current))
 }
