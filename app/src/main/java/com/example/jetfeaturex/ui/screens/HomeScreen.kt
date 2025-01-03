@@ -20,7 +20,8 @@ fun HomeScreen(navController: NavController) {
     val features = listOf(
         "Text Inputs" to "text_input",
         "Buttons" to "button_screen",
-        "Animations" to "animation_screen"
+        "Animations" to "animation_screen",
+        "MainDashboard" to "dashboard"
     )
     Scaffold(
         topBar = {

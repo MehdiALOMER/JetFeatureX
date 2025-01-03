@@ -579,7 +579,7 @@ fun MoreOptionsComp(
 }
 
 // Preview Function
-@Preview(showBackground = true, name = "Login Screen Preview")
+@Preview(showBackground = true, name = "Profile Screen Preview")
 @Composable
 fun ProfileScreenPreview() {
     ProfileScreen()
