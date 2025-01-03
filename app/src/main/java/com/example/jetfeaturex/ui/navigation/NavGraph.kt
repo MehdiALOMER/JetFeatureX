@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.yourname.jetfeaturex.ui.screens.HomeScreen
 import com.yourname.jetfeaturex.ui.screens.InputExamplesScreen
 import com.yourname.jetfeaturex.ui.screens.LoginScreen
+import com.yourname.jetfeaturex.ui.screens.ProfileScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -14,5 +15,6 @@ fun NavGraph(navController: NavHostController) {
         composable("login") { LoginScreen(navController) }
         composable("home") {  HomeScreen(navController)  }
         composable("text_input") { InputExamplesScreen() }
+        composable("profile") { ProfileScreen() }
     }
 }
